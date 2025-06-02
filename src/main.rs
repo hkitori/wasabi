@@ -35,6 +35,7 @@ enum EfiStatus {
     Success = 0,
 }
 
+// UEFI の Boot Services テーブルのうち、LocateProtocol 関数だけを取り出して定義
 #[repr(C)]
 struct EfiBootServicesTable {
     _reserved0: [u64; 40],
@@ -46,6 +47,7 @@ struct EfiBootServicesTable {
 }
 const _: () = assert!(offset_of!(EfiBootServicesTable, locate_protocol) == 320);
 
+// UEFI の System Table 全体のうち、Boot Services への参照だけを抜き出した構造体
 #[repr(C)]
 struct EfiSystemTable {
     _reserved0: [u64; 12],
@@ -53,6 +55,7 @@ struct EfiSystemTable {
 }
 const _: () = assert!(offset_of!(EfiSystemTable, boot_services) == 96);
 
+// Graphics Output Protocol の Mode 情報を表す構造体
 #[repr(C)]
 #[derive(Debug)]
 struct EfiGraphicsOutputProtocolMode<'a> {
@@ -64,6 +67,7 @@ struct EfiGraphicsOutputProtocolMode<'a> {
     pub frame_buffer_size: usize,
 }
 
+// Graphics Output Protocol 自体を表す構造体
 #[repr(C)]
 #[derive(Debug)]
 struct EfiGraphicsOutputProtocol<'a> {
@@ -71,6 +75,7 @@ struct EfiGraphicsOutputProtocol<'a> {
     pub mode: &'a EfiGraphicsOutputProtocolMode<'a>,
 }
 
+// 画素情報（横解像度・縦解像度・走査ラインあたりのピクセル数など）を表す構造体
 #[repr(C)]
 #[derive(Debug)]
 struct EfiGraphicsOutputProtocolPixelInfo {
@@ -82,6 +87,7 @@ struct EfiGraphicsOutputProtocolPixelInfo {
 }
 const _: () = assert!(size_of::<EfiGraphicsOutputProtocolPixelInfo>() == 36);
 
+// グラフィック出力プロトコルをUEFIの Boot Service 経由で取得する関数
 fn locate_graphic_protocol<'a>(
     efi_system_table: &EfiSystemTable,
 ) -> Result<&'a EfiGraphicsOutputProtocol<'a>> {
@@ -97,6 +103,7 @@ fn locate_graphic_protocol<'a>(
     Ok(unsafe { &*graphic_output_protocol })
 }
 
+// UEFI が直接呼び出すUEFI アプリケーションのエントリポイント
 #[no_mangle]
 fn efi_main(_image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
     let efi_graphics_output_protocol = locate_graphic_protocol(efi_system_table).unwrap();
@@ -113,6 +120,7 @@ fn efi_main(_image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
     loop {}
 }
 
+// パニックが発生した際に呼び出されるパニックハンドラ
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     loop {}
