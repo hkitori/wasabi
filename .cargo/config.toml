@@ -1,0 +1,25 @@
+[build] # build セクション: ビルド関連の設定
+# コンパイルターゲットを x86_64-unknown-uefi に設定 (UEFI 環境向け)
+target = 'x86_64-unknown-uefi'
+# Rust コンパイラに渡す追加フラグ
+# - Cforce-unwind-tables: アンワインド用のテーブルを強制生成（UEFI で panic を扱う際に必要）
+# - Cforce-frame-pointers: フレームポインタを常に保持（デバッグ時にコールスタックを辿りやすくする）
+# - Cno-redzone: Red Zone を無効化（UEFI の ABI では Red Zone を使えないため）
+rustflags = ["-Cforce-unwind-tables", "-Cforce-frame-pointers", "-Cno-redzone"]
+
+[unstable] # unstable セクション: Cargo の実験的機能を有効化
+# 標準ライブラリの一部を組み込み向けに再ビルドする
+# - core: コアランタイム（std を使わない環境で必要）
+# - compiler_builtins: コンパイラが必要とするビルトイン関数群
+# - alloc: ヒープ割り当てを行う機能（alloc crate）
+# - panic_abort: panic 時に abort するランタイム実装
+build-std = ["core", "compiler_builtins", "alloc", "panic_abort"]
+# build-std 実行時に有効化する機能フラグ
+# - compiler-builtins-mem: compiler_builtins のメモリ関数サポートを有効化
+build-std-features = ["compiler-builtins-mem"]
+
+[target.'cfg(target_os = "uefi")'] # ターゲット毎の設定: target_os が "uefi" の場合に適用される
+# ビルド後にバイナリを実行するコマンドを指定（UEFI イメージを QEMU で起動）
+runner = "bash scripts/launch_qemu.sh"
+
+
