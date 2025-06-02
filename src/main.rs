@@ -2,16 +2,19 @@
 #![no_main]
 #![feature(offset_of)]
 
+// 型や関数をインポート
 use core::mem::offset_of;
 use core::mem::size_of;
 use core::panic::PanicInfo;
 use core::ptr::null_mut;
 use core::slice;
 
+// UEFI の仕様で使われるいくつかの型エイリアスを定義
 type EfiVoid = u8;
 type EfiHandle = u64;
 type Result<T> = core::result::Result<T, &'static str>;
 
+// UEFI 上の GUID (グローバル一意識別子) を表す構造体
 #[repr(C)]
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 struct EfiGuid {
@@ -21,6 +24,7 @@ struct EfiGuid {
     pub data3: [u8; 8],
 }
 
+// UEFI のグラフィック出力プロトコル (GOP) の GUID
 const EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID: EfiGuid = EfiGuid {
     data0: 0x9042a9de,
     data1: 0x23dc,
@@ -28,6 +32,7 @@ const EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID: EfiGuid = EfiGuid {
     data3: [0x96, 0xfb, 0x7a, 0xde, 0xd0, 0x80, 0x51, 0x6a],
 };
 
+// UEFI のステータスコードを表す列挙型（今は成功時のみ定義）
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
 #[must_use]
 #[repr(u64)]
