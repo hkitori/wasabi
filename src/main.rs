@@ -3,6 +3,7 @@
 #![feature(offset_of)]
 
 // 型や関数をインポート
+use core::arch::asm;
 use core::mem::offset_of;
 use core::mem::size_of;
 use core::panic::PanicInfo;
@@ -108,6 +109,11 @@ fn locate_graphic_protocol<'a>(
     Ok(unsafe { &*graphic_output_protocol })
 }
 
+// loopでCPUサイクルを消費しないようにHLT命令を呼び出す関数
+pub fn hlt() {
+    unsafe { asm!("hlt") }
+}
+
 // UEFI が直接呼び出すUEFI アプリケーションのエントリポイント
 #[no_mangle]
 fn efi_main(_image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
@@ -122,11 +128,15 @@ fn efi_main(_image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
     }
 
     //println!("Hello, world!");
-    loop {}
+    loop {
+        hlt()
+    }
 }
 
 // パニックが発生した際に呼び出されるパニックハンドラ
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
-    loop {}
+    loop {
+        hlt()
+    }
 }
