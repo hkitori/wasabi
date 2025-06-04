@@ -8,6 +8,10 @@ if [ ! -f third_party/ovmf/RELEASEX64_OVMF.fd ]; then
     cd -
 fi
 
+if [ ! -f src/font.txt ]; then
+    curl https://raw.githubusercontent.com/hikalium/wasabi/main/font/font.txt > src/font.txt
+fi
+
 if [ ! -d mnt/EFI/BOOT ]; then
     mkdir -p mnt/EFI/BOOT
 fi
@@ -24,5 +28,6 @@ if [ $ret -ne 0 ]; then
 fi
 cp target/x86_64-unknown-uefi/debug/wasabi.efi mnt/EFI/BOOT/BOOTX64.EFI
 qemu-system-x86_64 -bios third_party/ovmf/RELEASEX64_OVMF.fd -drive format=raw,file=fat:rw:mnt
+
 
 
