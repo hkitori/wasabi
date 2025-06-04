@@ -130,8 +130,8 @@ fn efi_main(_image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
     let grid_size: i64 = 32;
     let rect_size: i64 = grid_size * 8;
     for i in (0..=rect_size).step_by(grid_size as usize) {
-        let _ = draw_line(&mut vram, 0xff000000, 0, i, rect_size, i);
-        let _ = draw_line(&mut vram, 0xff000000, i, 0, i, rect_size);
+        let _ = draw_line(&mut vram, 0xff0000, 0, i, rect_size, i);
+        let _ = draw_line(&mut vram, 0xff0000, i, 0, i, rect_size);
     }
     let cx = rect_size / 2;
     let cy = rect_size / 2;
