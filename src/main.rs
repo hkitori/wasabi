@@ -148,9 +148,7 @@ fn efi_main(_image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
     }
     draw_str_fg(&mut vram, 256, 256, 0xffffff, "Hello, world!");
     let mut w = VramTextWriter::new(&mut vram);
-    for i in 0..4 {
-        writeln!(w, "i = {i}").unwrap();
-    }
+    writeln!(w, "i").unwrap();
     //println!("Hello, world!");
     loop {
         hlt()
