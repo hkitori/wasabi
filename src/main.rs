@@ -3,13 +3,14 @@
 #![feature(offset_of)]
 
 // 型や関数をインポート
-use core::arch::asm;
 use core::fmt::Write;
 use core::panic::PanicInfo;
 use core::writeln;
 use wasabi::graphics::draw_test_pattern;
 use wasabi::graphics::fill_rect;
 use wasabi::graphics::Bitmap;
+use wasabi::qemu::exit_qemu;
+use wasabi::qemu::QemuExitCode;
 use wasabi::uefi::exit_from_efi_boot_services;
 use wasabi::uefi::init_vram;
 use wasabi::uefi::EfiHandle;
@@ -17,11 +18,7 @@ use wasabi::uefi::EfiMemoryType;
 use wasabi::uefi::EfiSystemTable;
 use wasabi::uefi::MemoryMapHolder;
 use wasabi::uefi::VramTextWriter;
-
-// loopでCPUサイクルを消費しないようにHLT命令を呼び出す関数
-pub fn hlt() {
-    unsafe { asm!("hlt") }
-}
+use wasabi::x86::hlt;
 
 // UEFI が直接呼び出すUEFI アプリケーションのエントリポイント
 #[no_mangle]
@@ -68,7 +65,5 @@ fn efi_main(image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
 // パニックが発生した際に呼び出されるパニックハンドラ
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
-    loop {
-        hlt()
-    }
+    exit_qemu(QemuExitCode::Fail);
 }

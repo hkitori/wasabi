@@ -25,9 +25,20 @@ cp ${PATH_TO_EFI} mnt/EFI/BOOT/BOOTX64.EFI
 # これにより「mnt/EFI/BOOT/BOOTX64.EFI」がQEMUゲストから認識される
 # isa-debug-exit デバイスを追加。UEFIアプリケーションが特定のI/Oポート（0xF4）に書き込むとQEMUが終了する仕組み
 # ユニットテストやUEFIアプリからの正常終了シグナルに便利
+set +e
 qemu-system-x86_64 \
     -m 1G \
     -bios third_party/ovmf/RELEASEX64_OVMF.fd \
     -drive format=raw,file=fat:rw:mnt \
     -device isa-debug-exit,iobase=0xf4,iosize=0x01
-
+RETCODE=$?
+set -e
+if [ $RETCODE -eq 0 ]; then
+    exit 0
+elif [ $RETCODE -eq 3 ]; then
+    printf "\nPASS\n"
+    exit 0
+else
+    priintf "\nFAIL: QEMU returned $RETCODE\n"
+    exit 1
+fi
