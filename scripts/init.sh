@@ -21,6 +21,7 @@ fi
 rustup target add x86_64-unknown-uefi
 
 # And also you need the following setting for rust-analyzer.
+# See also: https://lowlayergirls.github.io/wasabi-help/os1/
 #
 # > cat ~/.vim/coc-settings.json
 # {
