@@ -1,6 +1,8 @@
 #!/bin/sh
 
-
+# ---------------------------------------------------------
+#  init
+# ---------------------------------------------------------
 if [ ! -f third_party/ovmf/RELEASEX64_OVMF.fd ]; then
     mkdir -p third_party/ovmf
     cd third_party/ovmf
@@ -17,6 +19,25 @@ if [ ! -d mnt/EFI/BOOT ]; then
 fi
 
 rustup target add x86_64-unknown-uefi
+
+# And also you need the following setting for rust-analyzer.
+#
+# > cat ~/.vim/coc-settings.json
+# {
+#    "launguageserver": {
+#      "rust": {
+#        "command": "rust-analyzer",
+#        "filetypes": ["rust"],
+#        "rootPatterns": ["Cargo.toml"]
+#      }
+#    }
+#    "rust-analyzer.server.path": "~/.rustup/toolchains/nightly-2024-01-01-x86_64-unknown-linux-gnu/bin/rust-analyzer"
+# }
+# >
+
+# ---------------------------------------------------------
+#  build
+# ---------------------------------------------------------
 cargo build --target x86_64-unknown-uefi
 ret=$?
 #cargo run --target x86_64-unknown-uefi
@@ -26,6 +47,10 @@ if [ $ret -ne 0 ]; then
     echo "Error: cargo build failed..."
     exit 1
 fi
+
+# ---------------------------------------------------------
+#  run
+# ---------------------------------------------------------
 cp target/x86_64-unknown-uefi/debug/wasabi.efi mnt/EFI/BOOT/BOOTX64.EFI
 qemu-system-x86_64 -bios third_party/ovmf/RELEASEX64_OVMF.fd -drive format=raw,file=fat:rw:mnt
 
