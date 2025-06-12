@@ -43,6 +43,6 @@ elif [ $RETCODE -eq 3 ]; then
     printf "\nPASS\n"
     exit 0
 else
-    priintf "\nFAIL: QEMU returned $RETCODE\n"
+    printf "\nFAIL: QEMU returned $RETCODE\n"
     exit 1
 fi
