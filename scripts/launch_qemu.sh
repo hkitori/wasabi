@@ -18,6 +18,8 @@ mkdir -p mnt/EFI/BOOT/
 # QEMU起動時にこのEFIファイルがブートローダとして使用される
 cp ${PATH_TO_EFI} mnt/EFI/BOOT/BOOTX64.EFI
 
+mkdir -p log
+
 # ゲストに割り当てるメモリサイズを1GBに指定
 # OVMF（UEFI対応ファームウェア）をBIOSとして使用する
 # third_party/ovmf/RELEASEX64_OVMF.fd がUEFI環境を提供
@@ -30,6 +32,8 @@ qemu-system-x86_64 \
     -m 1G \
     -bios third_party/ovmf/RELEASEX64_OVMF.fd \
     -drive format=raw,file=fat:rw:mnt \
+    -chardev stdio,id=char_com1,mux=on,logfile=log/com1.txt \
+    -serial chardev:char_com1 \
     -device isa-debug-exit,iobase=0xf4,iosize=0x01
 RETCODE=$?
 set -e
