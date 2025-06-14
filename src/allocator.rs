@@ -48,7 +48,7 @@ struct Header {
 }
 
 const HEADER_SIZE: usize = size_of::<Header>();
-#[allow(clippy::assertions_on_constatns)]
+#[allow(clippy::assertions_on_constants)]
 const _: () = assert!(HEADER_SIZE == 32);
 // Size of Header should be power of 2
 const _: () = assert!(HEADER_SIZE.count_ones() == 1);
