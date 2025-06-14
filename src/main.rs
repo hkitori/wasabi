@@ -6,9 +6,11 @@
 use core::fmt::Write;
 use core::panic::PanicInfo;
 use core::writeln;
+use wasabi::error;
 use wasabi::graphics::draw_test_pattern;
 use wasabi::graphics::fill_rect;
 use wasabi::graphics::Bitmap;
+use wasabi::info;
 use wasabi::init::init_basic_runtime;
 use wasabi::println;
 use wasabi::qemu::exit_qemu;
@@ -21,6 +23,7 @@ use wasabi::uefi::EfiMemoryType;
 use wasabi::uefi::EfiSystemTable;
 use wasabi::uefi::MemoryMapHolder;
 use wasabi::uefi::VramTextWriter;
+use wasabi::warn;
 use wasabi::x86::hlt;
 
 // UEFI が直接呼び出すUEFI アプリケーションのエントリポイント
@@ -65,6 +68,7 @@ fn efi_main(image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
 
 // パニックが発生した際に呼び出されるパニックハンドラ
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+fn panic(info: &PanicInfo) -> ! {
+    error!("PANIC: {info:?}");
     exit_qemu(QemuExitCode::Fail);
 }
