@@ -39,6 +39,9 @@ rustup target add x86_64-unknown-uefi
 
 # install cargo-objdump
 cargo install cargo-binutils --locked
+# then, you can use cargo-objdump like this:
+#   cargo-objdump -- -d --x86-asm-syntax=intel
+
 
 # ---------------------------------------------------------
 #  build
