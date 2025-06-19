@@ -36,6 +36,10 @@ rustup target add x86_64-unknown-uefi
 # }
 # >
 
+
+# install cargo-objdump
+cargo install cargo-binutils --locked
+
 # ---------------------------------------------------------
 #  build
 # ---------------------------------------------------------
