@@ -15,10 +15,9 @@ use wasabi::graphics::draw_test_pattern;
 use wasabi::graphics::fill_rect;
 use wasabi::graphics::Bitmap;
 use wasabi::hpet::global_timestamp;
-use wasabi::hpet::set_global_hpet;
-use wasabi::hpet::Hpet;
 use wasabi::info;
 use wasabi::init::init_basic_runtime;
+use wasabi::init::init_hpet;
 use wasabi::init::init_paging;
 use wasabi::print::hexdump;
 use wasabi::println;
@@ -105,13 +104,7 @@ fn efi_main(image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
     }
     flush_tlb();
 
-    let hpet = acpi.hpet().expect("Failed to get HPET from APCI");
-    let hpet = hpet
-        .base_address()
-        .expect("Failed to get HPET base address");
-    info!("HPET is at {hpet:#p}");
-    let hpet = Hpet::new(hpet);
-    set_global_hpet(hpet);
+    init_hpet(acpi);
     let t0 = global_timestamp();
     let task1 = Task::new(async move {
         for i in 100..=103 {
