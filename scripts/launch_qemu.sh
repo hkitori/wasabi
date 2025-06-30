@@ -31,6 +31,7 @@ set +e
 qemu-system-x86_64 \
     -m 1G \
     -bios third_party/ovmf/RELEASEX64_OVMF.fd \
+    -machine q35 \
     -drive format=raw,file=fat:rw:mnt \
     -chardev stdio,id=char_com1,mux=on,logfile=log/com1.txt \
     -serial chardev:char_com1 \
