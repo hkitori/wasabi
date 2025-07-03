@@ -11,6 +11,7 @@ use core::marker::PhantomData;
 use core::mem::offset_of;
 use core::mem::size_of;
 use core::mem::size_of_val;
+use core::mem::ManuallyDrop;
 use core::mem::MaybeUninit;
 use core::pin::Pin;
 
@@ -62,7 +63,7 @@ const ATTR_CACHE_DISABLE: u64 = 1 << 4;
 pub enum PageAttr {
     NotPresent = 0,
     ReadWriteKernel = ATTR_PRESENT | ATTR_WRITABLE,
-    ReadWrieIo = ATTR_PRESENT | ATTR_WRITABLE | ATTR_WRITE_THROUGH | ATTR_CACHE_DISABLE,
+    ReadWriteIo = ATTR_PRESENT | ATTR_WRITABLE | ATTR_WRITE_THROUGH | ATTR_CACHE_DISABLE,
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -919,4 +920,29 @@ pub fn flush_tlb() {
     unsafe {
         write_cr3(read_cr3());
     }
+}
+
+/// # Safety
+/// This will create a mutable reference to the page table structure
+/// So it is programmer's responsibility to ensure that at most one
+/// instane of the reference exist at every momoent.
+pub unsafe fn take_current_page_table() -> ManuallyDrop<Box<PML4>> {
+    ManuallyDrop::new(Box::from_raw(read_cr3()))
+}
+/// # Safety
+///  This function sets the CR3 value so that anything bad can hppen.
+pub unsafe fn put_current_page_table(mut table: ManuallyDrop<Box<PML4>>) {
+    // Set CR3 to reflect the updates and drop TLB caches.
+    write_cr3(Box::into_raw(ManuallyDrop::take(&mut table)))
+}
+/// # Safety
+/// This function modifies the page table as callback does, so
+/// anything bad can happen if there are some mistakes.
+pub unsafe fn with_current_page_table<F>(callback: F)
+where
+    F: FnOnce(&mut PML4),
+{
+    let mut table = take_current_page_table();
+    callback(&mut table);
+    put_current_page_table(table)
 }
