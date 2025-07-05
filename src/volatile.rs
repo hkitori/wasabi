@@ -66,24 +66,24 @@ impl<
 #[test_case]
 fn write_bits_tests() {
     let mut v: Volatile<u16> = Volatile::default();
-    assert_eq!(v.raed(), 0b0000_0000_0000_0000);
+    assert_eq!(v.read(), 0b0000_0000_0000_0000);
     assert!(v.write_bits(0, 1, 0b00).is_ok());
-    assert_eq!(v.raed(), 0b0000_0000_0000_0000);
+    assert_eq!(v.read(), 0b0000_0000_0000_0000);
     assert!(v.write_bits(0, 1, 0b01).is_ok());
-    assert_eq!(v.raed(), 0b0000_0000_0000_0001);
+    assert_eq!(v.read(), 0b0000_0000_0000_0001);
     assert!(v.write_bits(0, 1, 0b10).is_err());
-    assert_eq!(v.raed(), 0b0000_0000_0000_0001);
+    assert_eq!(v.read(), 0b0000_0000_0000_0001);
     assert!(v.write_bits(1, 1, 0b00).is_ok());
-    assert_eq!(v.raed(), 0b0000_0000_0000_0001);
+    assert_eq!(v.read(), 0b0000_0000_0000_0001);
     assert!(v.write_bits(1, 1, 0b01).is_ok());
-    assert_eq!(v.raed(), 0b0000_0000_0000_0011);
+    assert_eq!(v.read(), 0b0000_0000_0000_0011);
     assert!(v.write_bits(1, 1, 0b00).is_ok());
-    assert_eq!(v.raed(), 0b0000_0000_0000_0001);
+    assert_eq!(v.read(), 0b0000_0000_0000_0001);
     assert!(v.write_bits(1, 1, 0b10).is_err());
-    assert_eq!(v.raed(), 0b0000_0000_0000_0001);
+    assert_eq!(v.read(), 0b0000_0000_0000_0001);
     assert!(v.write_bits(8, 4, 0b1010).is_ok());
-    assert_eq!(v.raed(), 0b0000_1010_0000_0001);
-    assert!(v.read_bits(8, 4), 0b1010);
+    assert_eq!(v.read(), 0b0000_1010_0000_0001);
+    assert_eq!(v.read_bits(8, 4), 0b1010);
     let mut v: Volatile<u32> = Volatile::default();
     assert_eq!(v.read(), 0x0000_0000);
     assert!(v.write_bits(24, 8, 0xAA).is_ok());
