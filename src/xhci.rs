@@ -244,6 +244,7 @@ impl PciXhciDriver {
                 )
                 .await?;
                 let mut prev_pressed = BTreeSet::new();
+                //info!("workaround to avoid panic");
                 loop {
                     let pressed = {
                         let report =
