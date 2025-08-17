@@ -1130,7 +1130,7 @@ enum TrbType {
     EnableSlotCommand = 9,
     AddressDeviceCommand = 11,
     ConfigureEndpointCommand = 12,
-    EvaluateContextCommadn = 13,
+    EvaluateContextCommand = 13,
     NoOpCommand = 23,
     TransferEvent = 32,
     CommandCompletionEvent = 33,
@@ -1649,7 +1649,7 @@ impl SetupStageTrb {
     //      1: Device to Host
     pub const REQ_TYPE_DIR_DEVICE_TO_HOST: u8 = 1 << 7;
     pub const REQ_TYPE_DIR_HOST_TO_DEVICE: u8 = 0 << 7;
-    // bmRequset bit[5..=6]: Reqest Type
+    // bmRequest bit[5..=6]: Reqest Type
     //      0: Standard
     //      1: Class
     //      2: Vendor
