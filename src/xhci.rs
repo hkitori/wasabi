@@ -162,7 +162,7 @@ impl PciXhciDriver {
                             slot,
                             &mut ctrl_ep_ring,
                             lang_id,
-                            device_descriptor.product_idx,
+                            device_descriptor.manufacturer_idx,
                         )
                         .await?,
                     )
@@ -296,6 +296,7 @@ impl PciXhciDriver {
         // 4. Initialize the Transfer Ring for the Default Control Endpoint
         // 5. Initialize the Input default Control Endpoint 0 Context (6.2.3)
         let portsc = xhc.regs.portsc.get(port).ok_or("PORTSC was invalid")?;
+        input_context.as_mut().set_port_speed(portsc.port_speed())?;
         let ctrl_ep_ring = CommandRing::default();
         input_context.as_mut().set_ep_ctx(
             1,
