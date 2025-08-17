@@ -68,8 +68,8 @@ pub enum PageAttr {
 }
 
 #[derive(Debug, Eq, PartialEq)]
-pub enum TranslationReuslt {
-    PageMapped4k { phys: u64 },
+pub enum TranslationResult {
+    PageMapped4K { phys: u64 },
     PageMapped2M { phys: u64 },
     PageMapped1G { phys: u64 },
 }
@@ -417,7 +417,7 @@ macro_rules! interrupt_entrypoint {
             "interrupt_entrypoint",
             stringify!($index),
             ":\n",
-            "push 0 // No eror code\n",
+            "push 0 // No error code\n",
             "push rcx // Save rcx first to reuse\n",
             "mov rcx,  ",
             stringify!($index),
@@ -555,7 +555,7 @@ extern "sysv64" fn inthandler(info: &InterruptInfo, index: usize) {
             error!("CR2={:#018X}", read_cr2());
             error!(
                 "Caused by: A {} mode {} on a {} page, page structures are {}",
-                if info.error_code & 0b0000_0110 != 0 {
+                if info.error_code & 0b0000_0100 != 0 {
                     "user"
                 } else {
                     "supervisor"
@@ -643,12 +643,12 @@ impl IdtDescriptor {
 #[allow(dead_code)]
 #[repr(C, packed)]
 #[derive(Debug)]
-struct IdtParameters {
+struct IdtrParameters {
     limit: u16,
     base: *const IdtDescriptor,
 }
-const _: () = assert!(size_of::<IdtParameters>() == 10);
-const _: () = assert!(offset_of!(IdtParameters, base) == 2);
+const _: () = assert!(size_of::<IdtrParameters>() == 10);
+const _: () = assert!(offset_of!(IdtrParameters, base) == 2);
 
 pub struct Idt {
     #[allow(dead_code)]
@@ -702,7 +702,7 @@ impl Idt {
         );
         let limit = size_of_val(&entries) as u16;
         let entries = Box::pin(entries);
-        let params = IdtParameters {
+        let params = IdtrParameters {
             limit,
             base: entries.as_ptr(),
         };
@@ -788,7 +788,7 @@ pub const BIT_TYPE_CODE: u64 = 0b11u64 << 43;
 
 pub const BIT_PRESENT: u64 = 1u64 << 47;
 pub const BIT_CS_LONG_MODE: u64 = 1u64 << 53;
-pub const BIT_CS_READABLE: u64 = 1u64 << 53;
+pub const BIT_CS_READABLE: u64 = 1u64 << 41;
 pub const BIT_DS_WRITABLE: u64 = 1u64 << 41;
 
 pub const BIT_DPL0: u64 = 0u64 << 45;
@@ -802,7 +802,7 @@ enum GdtAttr {
 
 #[allow(dead_code)]
 #[repr(C, packed)]
-struct GdtParameters {
+struct GdtrParameters {
     limit: u16,
     base: *const Gdt,
 }
@@ -828,7 +828,7 @@ pub struct GdtWrapper {
 
 impl GdtWrapper {
     pub fn load(&self) {
-        let params = GdtParameters {
+        let params = GdtrParameters {
             limit: (size_of::<Gdt>() - 1) as u16,
             base: self.inner.as_ref().get_ref() as *const Gdt,
         };
