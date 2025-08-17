@@ -130,7 +130,7 @@ impl Header {
 }
 impl Drop for Header {
     fn drop(&mut self) {
-        panic!("Header should be not be dropped!");
+        panic!("Header should not be dropped!");
     }
 }
 impl fmt::Debug for Header {
@@ -164,7 +164,7 @@ unsafe impl GlobalAlloc for FirstFitAllocator {
         let mut region = Header::from_allocated_region(ptr);
         region.is_allocated = false;
         Box::leak(region);
-        // region is leaked here to avoid dropping the free into on the memory.2
+        // region is leaked here to avoid dropping the free info on the memory.
     }
 }
 
@@ -217,7 +217,7 @@ impl FirstFitAllocator {
         header.as_mut().unwrap().next_header = prev_last;
         // It's okay not to be sorted the headers at this point
         // since all the regions written in memory maps are not contiguous
-        // so that they can't be mreged anyway
+        // so that they can't be merged anyway
     }
 }
 
@@ -244,6 +244,8 @@ mod test {
                 *e = ALLOCATOR.alloc_with_options(
                     Layout::from_size_align(1234, align).expect("Failed to create Layout"),
                 );
+                assert!(*e as usize != 0);
+                assert!((*e as usize) % align == 0);
             }
         }
     }
@@ -256,6 +258,8 @@ mod test {
                 *e = ALLOCATOR.alloc_with_options(
                     Layout::from_size_align(1234, align).expect("Failed to create Layout"),
                 );
+                assert!(*e as usize != 0);
+                assert!((*e as usize) % align == 0);
             }
         }
     }
@@ -270,10 +274,9 @@ mod test {
             Layout::from_size_align(6000, 64).unwrap(),
             Layout::from_size_align(4, 4).unwrap(),
             Layout::from_size_align(2, 2).unwrap(),
-            Layout::from_size_align(60000, 64).unwrap(),
+            Layout::from_size_align(600000, 64).unwrap(),
             Layout::from_size_align(64, 64).unwrap(),
             Layout::from_size_align(1, 1).unwrap(),
-            Layout::from_size_align(6000, 64).unwrap(),
             Layout::from_size_align(6000, 64).unwrap(),
             Layout::from_size_align(6000, 64).unwrap(),
             Layout::from_size_align(6000, 64).unwrap(),
@@ -346,7 +349,6 @@ mod test {
                 unsafe { *pointer.add(k) = i as u8 }
             }
         }
-
         for e in allocations.iter().zip(pointers.iter_mut()).enumerate() {
             let (i, (layout, pointer)) = e;
             for k in 0..layout.size() {
