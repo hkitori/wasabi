@@ -4,7 +4,7 @@ use crate::x86::read_io_port_u8;
 use crate::x86::write_io_port_u8;
 use core::fmt;
 
-// c.f. https://wiki.osdev.org/Serial_ports
+// c.f. https://wiki.osdev.org/Serial_Ports
 
 pub struct SerialPort {
     base: u16,
@@ -20,7 +20,7 @@ impl SerialPort {
     pub fn init(&mut self) {
         // Disable all interrupts
         write_io_port_u8(self.base + 1, 0x00);
-        // Enable DLAB ( ¥set baud rate divisor)
+        // Enable DLAB (set baud rate divisor)
         write_io_port_u8(self.base + 3, 0x80);
         // baud rate = (115200 / BAUD_DIVISOR)
         const BAUD_DIVISOR: u16 = 0x0001;
