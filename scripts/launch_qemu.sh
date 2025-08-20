@@ -38,6 +38,7 @@ qemu-system-x86_64 \
     -serial chardev:char_com1 \
     -device qemu-xhci \
     -device usb-kbd \
+    -device usb-tablet \
     -device isa-debug-exit,iobase=0xf4,iosize=0x01
 RETCODE=$?
 set -e
