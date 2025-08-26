@@ -14,6 +14,7 @@ use crate::pci::BusDeviceFunction;
 use crate::pci::Pci;
 use crate::pci::VendorDeviceId;
 use crate::result::Result;
+use crate::tablet::start_usb_tablet;
 use crate::usb;
 use crate::volatile::Volatile;
 use crate::x86::busy_loop_hint;
@@ -21,7 +22,6 @@ use alloc::boxed::Box;
 use alloc::collections::VecDeque;
 use alloc::rc::Rc;
 use alloc::rc::Weak;
-use alloc::vec;
 use alloc::vec::Vec;
 use core::alloc::Layout;
 use core::cmp::max;
@@ -201,6 +201,18 @@ impl PciXhciDriver {
                 if start_usb_keyboard(&xhc, slot, &mut ctrl_ep_ring, &descriptors)
                     .await
                     .is_ok()
+                {
+                    return Ok(());
+                }
+                if start_usb_tablet(
+                    &xhc,
+                    slot,
+                    &mut ctrl_ep_ring,
+                    &device_descriptor,
+                    &descriptors,
+                )
+                .await
+                .is_ok()
                 {
                     return Ok(());
                 }
